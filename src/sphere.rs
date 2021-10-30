@@ -6,7 +6,7 @@ use bevy::{
 use core::panic;
 
 /// Defines a bounding sphere with a radius and an origin at the center.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Component)]
 pub struct BSphere {
     /// Origin of the sphere in mesh space. The intent is that the bounding volume will be queried
     /// along with its [GlobalTransform], so the origin of the sphere will be transformed to the
@@ -46,7 +46,7 @@ impl BoundingVolume for BSphere {
         let vertices: Vec<Vec3> = match mesh.attribute(Mesh::ATTRIBUTE_POSITION) {
             None => panic!("Mesh does not contain vertex positions"),
             Some(vertex_values) => match &vertex_values {
-                VertexAttributeValues::Float3(positions) => positions
+                VertexAttributeValues::Float32x3(positions) => positions
                     .iter()
                     .map(|coordinates| Vec3::from(*coordinates))
                     .collect(),
@@ -100,6 +100,7 @@ impl BoundingVolume for BSphere {
         }
     }
 
+    /*
     /// Generate a debug mesh, and apply the inverse transform. Because the debug mesh is a child,
     /// the transform of the parent will be applied to it. This needs to be negated so the bounding
     /// circle debug mesh isn't warped.
@@ -112,7 +113,7 @@ impl BoundingVolume for BSphere {
         match mesh.attribute_mut(Mesh::ATTRIBUTE_POSITION) {
             None => panic!("Mesh does not contain vertex positions"),
             Some(vertex_values) => match vertex_values {
-                VertexAttributeValues::Float3(ref mut positions) => {
+                VertexAttributeValues::Float32x3(ref mut positions) => {
                     *positions = positions
                         .iter()
                         .map(|coordinates| {
@@ -125,6 +126,7 @@ impl BoundingVolume for BSphere {
         };
         mesh
     }
+    */
 
     fn update_on_transform_change(&self, mesh: &Mesh, transform: &GlobalTransform) -> Option<Self> {
         Some(Self::new(mesh, transform))

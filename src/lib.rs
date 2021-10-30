@@ -1,10 +1,10 @@
 pub mod aabb;
-pub mod debug;
+//pub mod debug;
 pub mod obb;
 pub mod sphere;
 
 use bevy::{prelude::*, transform::TransformSystem};
-use debug::{update_debug_mesh_visibility, update_debug_meshes};
+//use debug::{update_debug_mesh_visibility, update_debug_meshes};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 
@@ -24,9 +24,8 @@ pub struct BoundingVolumePlugin<T: BoundingVolume> {
 impl<T> Plugin for BoundingVolumePlugin<T>
 where
     T: 'static + Send + Sync + BoundingVolume + Clone + Debug,
-    Mesh: From<&'static T>,
 {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.add_system_to_stage(CoreStage::PreUpdate, spawn::<T>.system())
             .add_system_to_stage(
                 CoreStage::PostUpdate,
@@ -34,21 +33,21 @@ where
                     .system()
                     .after(TransformSystem::TransformPropagate)
                     .label(BoundingSystem::UpdateBounds),
-            )
+            );
+        /*
             .add_system_to_stage(
                 CoreStage::PostUpdate,
                 update_debug_meshes::<T>
-                    .system()
                     .after(BoundingSystem::UpdateBounds)
                     .label(BoundingSystem::UpdateDebug),
-            )
-            .add_system_to_stage(
-                CoreStage::PostUpdate,
-                update_debug_mesh_visibility::<T>
-                    .system()
-                    .after(BoundingSystem::UpdateDebug)
-                    .before(bevy::render::RenderSystem::VisibleEntities),
             );
+        .add_system_to_stage(
+            CoreStage::PostUpdate,
+            update_debug_mesh_visibility::<T>
+                .after(BoundingSystem::UpdateDebug)
+                .before(bevy::render::RenderSystem::VisibleEntities),
+        );
+        */
     }
 }
 
@@ -57,7 +56,7 @@ where
 /// the aforementioned mesh has loaded and can be read. This ensures that bounding volume
 /// components are always valid when queried, and at worst case can only be out of date if queried
 /// in a frame before the bounding volume update system is run.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Component)]
 pub struct Bounded<T: BoundingVolume + Send + Sync>(PhantomData<T>);
 
 impl<T: BoundingVolume + Send + Sync> Default for Bounded<T> {
@@ -69,11 +68,11 @@ impl<T: BoundingVolume + Send + Sync> Default for Bounded<T> {
 /// A [BoundingVolume] stores its properties in mesh space to maximize precision. Because some types
 /// of bounding volume must be recomputed if the mesh is scaled or rotated, this trait calls an
 /// update function depending on whether the mesh or transform has updated.
-pub trait BoundingVolume {
+pub trait BoundingVolume: Component {
     /// Initializes a valid bounding volume given a [Mesh] and [GlobalTransform].
     fn new(mesh: &Mesh, transform: &GlobalTransform) -> Self;
     /// Generate a debug [Mesh] representing the bounding volume from a [BoundingVolume].
-    fn new_debug_mesh(&self, transform: &GlobalTransform) -> Mesh;
+    //fn new_debug_mesh(&self, transform: &GlobalTransform) -> Mesh;
     /// This function is only called when only the entity's [GlobalTransform] has changed. Only
     /// some types of bounding volume need to be recomputed in this case.
     fn update_on_transform_change(

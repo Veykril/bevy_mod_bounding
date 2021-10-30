@@ -5,9 +5,11 @@ use bevy::{
 };
 
 /// Marks an entity that should have a mesh added as a child to represent the mesh's bounding volume.
+#[derive(Component)]
 pub struct DebugBounds;
 
 /// Marks the debug bounding volume mesh, which exists as a child of a [BoundingVolumeDebug] entity
+#[derive(Component)]
 pub struct DebugBoundsMesh;
 
 /// Updates existing debug meshes, and creates new debug meshes on entities with a bounding volume
@@ -60,7 +62,7 @@ pub fn update_debug_meshes<T>(
 }
 
 #[allow(clippy::type_complexity)]
-pub fn update_debug_mesh_visibility<T>(
+pub fn update_debug_mesh_visibility<T: Component>(
     mut query: QuerySet<(
         Query<(&Children, &Visible), (With<DebugBounds>, With<T>, Changed<Visible>)>,
         Query<&mut Visible, With<DebugBoundsMesh>>,

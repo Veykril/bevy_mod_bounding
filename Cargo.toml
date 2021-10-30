@@ -10,7 +10,8 @@ keywords = ["gamedev", "graphics", "bevy", "3d", "bounding"]
 categories = ["game-engines", "rendering"]
 
 [dependencies]
-bevy = { version = "0.5", default-features = false, features = ["render"] }
+bevy = { path="../bevy", default-features = false, features = ["render"] }
+#bevy = { version = "0.5", default-features = false, features = ["render"] }
 #bevy = { git = "https://github.com/bevyengine/bevy", branch = "main", default-features = false, features = ["render"] }
 
 [features]
